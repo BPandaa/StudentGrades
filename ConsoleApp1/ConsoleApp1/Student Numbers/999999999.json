@@ -1,0 +1,22 @@
+{
+  "Name": "meow",
+  "Age": 19,
+  "StudentNumber": "999999999",
+  "Password": "bobi",
+  "StudentGrades": [
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0
+  ],
+  "StudentModules": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  ]
+}

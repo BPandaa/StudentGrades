@@ -1,0 +1,22 @@
+{
+  "Name": "boobi",
+  "Age": 33,
+  "StudentNumber": "123456789",
+  "Password": "poopi",
+  "StudentGrades": [
+    80.0,
+    90.0,
+    3.0,
+    80.0,
+    5.0,
+    6.0
+  ],
+  "StudentModules": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  ]
+}

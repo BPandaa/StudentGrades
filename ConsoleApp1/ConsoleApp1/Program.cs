@@ -1,187 +1,242 @@
 ﻿using System;
-// add additional classes required for Regex validation
-using System.Text.RegularExpressions;
-using System.Globalization;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace StudentsGrades
 {
     class Program
     {
+       
+        public static readonly string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Student Numbers");
         static void Main(string[] args)
-        {
-
-
-
-            // declare variables
-            String sStudentName, iStudentNumber, sMarks;
-            double dGrades = 0; // initialise grades
-            string[] Module = new string[6];
-            double[] aDoubleGrades = new double[6];
-            string title = @"
-   _____ _             _            _                          _                    _            _       _            
-  / ____| |           | |          | |                        | |                  | |          | |     | |            
- | (___ | |_ _   _  __| | ___ _ __ | |_   _ __ ___   __ _ _ __| | _____    ___ __ _| | ___ _   _| | __ _| |_ ___  _ __
-  \___ \| __| | | |/ _` |/ _ \ '_ \| __| | '_ ` _ \ / _` | '__| |/ / __|  / __/ _` | |/ __| | | | |/ _` | __/ _ \| '__|
-  ____) | |_| |_| | (_| |  __/ | | | |_  | | | | | | (_| | |  |   <\__ \ | (_| (_| | | (__| |_| | | (_| | || (_) | |  
- |_____/ \__|\__,_|\__,_|\___|_| |_|\__| |_| |_| |_|\__,_|_|  |_|\_\___/  \___\__,_|_|\___|\__,_|_|\__,_|\__\___/|_|                                                                                        
-";
-
-
-            string title1 = @"
-   _____  _               _               _     _          __                                _    _              
-  / ____|| |             | |             | |   (_)        / _|                              | |  (_)              
- | (___  | |_  _   _   __| |  ___  _ __  | |_   _  _ __  | |_  ___   _ __  _ __ ___    __ _ | |_  _   ___   _ __  
-  \___ \ | __|| | | | / _` | / _ \| '_ \ | __| | || '_ \ |  _|/ _ \ | '__|| '_ ` _ \  / _` || __|| | / _ \ | '_ \
-  ____) || |_ | |_| || (_| ||  __/| | | || |_  | || | | || | | (_) || |   | | | | | || (_| || |_ | || (_) || | | |
- |_____/  \__| \__,_| \__,_| \___||_| |_| \__| |_||_| |_||_|  \___/ |_|   |_| |_| |_| \__,_| \__||_| \___/ |_| |_|                                                                                                                                                                                                                                                                
-";
-            
-
-            
-
-
-            // Display "CET133 assignment 1" in the center of the console
-
-            string s = "CET133 assignment 1";
-            Console.SetCursorPosition((Console.WindowWidth - s.Length) / 2, Console.CursorTop);
-            Console.WriteLine(s);
-            Console.WriteLine();
-
-            // ask student for name
-
-            Console.WriteLine("Please enter your full name: \n");
-            sStudentName = Console.ReadLine() ?? string.Empty;
-            Console.WriteLine();
-
-            // make sure to validate only entering letters and spaces
-
-            while (!Regex.IsMatch(sStudentName, @"^[a-zA-Z\s]*$"))
+        { 
+            while (true)
             {
-                Console.WriteLine("Please enter your profile name using only letters.\n");
-                sStudentName = Console.ReadLine()?? string.Empty;
-                Console.WriteLine();
-            }
+                
+                Console.WriteLine("1. Admin");
+                Console.WriteLine("2. User");
+                Console.WriteLine("3. Quit");
+                Console.Write("Select an option: ");
 
-            // ask user for number
+                string option = Console.ReadLine() ?? string.Empty;
 
-            Console.WriteLine("Please enter a 9 digit number : \n");
-            iStudentNumber = Console.ReadLine() ?? string.Empty;
-            Console.WriteLine();
-
-            // make sure its a 9 digit number
-            while (!Regex.IsMatch(iStudentNumber, "^\\d{9}$"))
-            {
-                Console.WriteLine("You don't have a match, please try again \n");
-                iStudentNumber = Console.ReadLine() ?? string.Empty;
-                Console.WriteLine();
-            }
-
-            // clear screen
-
-            Console.Clear();
-
-            // calculate student marks
-
-
-            Console.WriteLine(title);
-
-            for (int i = 0; i < 6; i++)
-            {
-                // ask user for module name
-                Console.Write("What's your #" + (i + 1) + " module name : ");
-
-                Module[i] = Console.ReadLine() ?? string.Empty;
-
-
-                Console.Write("\n");
-
-                // make sure validate characters and spaces
-
-                while (!Regex.IsMatch(Module[i], @"^[\w\s]*$"))
+                switch (option)
                 {
-                    Console.WriteLine("Please enter a valid module using letters and numbers : ");
-                    Console.WriteLine();
-                    Module[i] = Console.ReadLine() ?? string.Empty;
-                    Console.WriteLine();
+                    case "1":
+                        AdminLogin();
+                        break;
+                    case "2":
+                        UserLogin();
+                        break;
+                    case "3":
+                        Console.WriteLine("Goodbye");
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please try again.");
+                        break;
                 }
-
-                //ask user for module grade
-                Console.Write("How many marks have you got for " + Module[i] + " : ");
-                sMarks = Console.ReadLine() ?? string.Empty;
-
-                Console.Write("\n");
-
-                // make sure its between 0-100 digit number
-
-                while (!Regex.IsMatch(sMarks, @"^0*(?:[0-9][0-9]?([\.]\d+)?|100?)$"))
-                {
-
-                    Console.Write("please enter a number between 0-100\n");
-                    Console.WriteLine();
-                    Console.Write(Module[i] + " : ");
-                    sMarks = Console.ReadLine() ?? string.Empty;
-                    Console.WriteLine();
-                }
-
-                // store the results in a table
-
-                aDoubleGrades[i] = Convert.ToDouble(sMarks);
-
-
-                dGrades = dGrades + aDoubleGrades[i];
-
-            }
-            // calculate grade
-
-            dGrades = dGrades / 6.0;
-
-            dGrades = Math.Round(dGrades, 2);
-
-            //clear screen
-
-            Console.Clear();
-
-            /* Display  summary of the student, including ID details, individual module marks and overall course result */
-            Console.WriteLine(title1);
-
-            
-            // Display student name and number
-            Console.SetCursorPosition((Console.WindowWidth - s.Length) / 3, Console.CursorTop);
-            Console.WriteLine("Hello " + sStudentName + " ! Your student number is : " + iStudentNumber + "\n");
-            Console.WriteLine();
-
-            //Display Student Grades
-            Console.SetCursorPosition((Console.WindowWidth - s.Length) / 2, Console.CursorTop);
-            Console.WriteLine("Student grades  \n");
-            for (int i = 0; i < 6; i++)
-            {
-                Console.WriteLine("For " + Module[i] + " you got : " + aDoubleGrades[i] + "\n");
-            }
-            //Display Student average rade
-            Console.SetCursorPosition((Console.WindowWidth - s.Length) / 2, Console.CursorTop);
-            Console.WriteLine("Average grade : " + dGrades + "\n");
-
-            // make sure if the user fail or pass
-            if (dGrades >= 40)
-            {
-                Console.SetCursorPosition((Console.WindowWidth - s.Length) / 3, Console.CursorTop);
-                Console.Write("Congratulations! You have successfully completed this course!\n");
-            }
-
-            else
-            {
-                Console.SetCursorPosition((Console.WindowWidth - s.Length) / 6, Console.CursorTop);
-                Console.Write("Sorry you failed your course\n");
-            }
-
-
-            // press the enter key to exit
-
-            Console.Write("\nPress 'Enter' to exit the process...");
-
-            while (Console.ReadKey().Key != ConsoleKey.Enter)
-            {
             }
         }
+
+            static void AdminLogin()
+{
+    Console.Write("Enter admin password: ");
+    string password = Console.ReadLine() ?? string.Empty;
+
+    if (password == "adminpassword")
+    {
+        Console.Clear();
+        string[] files = Directory.GetFiles(folderPath, "*.json");
+        if (files.Length == 0)
+        {
+            Console.WriteLine("No student records found.");
+            return;
+        }
+
+        while (true) // Loop until a valid student number is entered or the admin chooses to exit
+        {
+            Console.WriteLine("Available student records:");
+            foreach (string file in files)
+            {
+                Console.WriteLine(Path.GetFileNameWithoutExtension(file));
+            }
+
+            Console.WriteLine("\nEnter the student number to view or edit, or type 'exit' to go back:");
+            string studentNumber = Console.ReadLine() ?? string.Empty;
+            Console.Clear();
+            if (studentNumber.ToLower() == "exit")
+            {
+                break; // Exit the loop and go back
+            }
+
+            string filePath = Path.Combine(folderPath, $"{studentNumber}.json");
+
+            if (File.Exists(filePath))
+            {
+                string data = File.ReadAllText(filePath);
+                Student student = JsonConvert.DeserializeObject<Student>(data);
+                if (student != null)
+                {
+                    AdminEditStudent(student);
+                    break; // Exit the loop after editing
+                }
+                else
+                {
+                    Console.WriteLine("Failed to deserialize student data.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Student record not found. Please try again.");
+            }
+        }
+    }
+    else
+    {
+        Console.Clear();
+        Console.WriteLine("Incorrect password.");
+    }
+}
+static void AdminEditStudent(Student student)
+{
+    // Display complete student information for admin
+    student.DisplayInfoForAdmin();
+
+    Console.WriteLine("Do you want to edit this student's information? (yes/no)");
+    string editChoice = Console.ReadLine()?.ToLower() ?? string.Empty;
+
+    if (editChoice == "yes" || editChoice == "y")
+    {
+        Console.WriteLine("Select what to edit:");
+        Console.WriteLine("1. Personal Information");
+        Console.WriteLine("2. Password");
+        Console.WriteLine("3. Module Grades");
+        Console.Write("Enter your choice: ");
+        string adminEditChoice = Console.ReadLine() ?? string.Empty;
+
+        switch (adminEditChoice)
+        {
+            case "1":
+                student.UpdateInfo();
+                student.SaveToFile();
+                Console.Clear();
+                Console.WriteLine("Student information updated successfully.");
+                AdminEditStudent(student);;
+                break;
+            case "2":
+                 Console.Write("Enter a new password: ");
+                 student.Password = Console.ReadLine() ?? string.Empty;
+                 student.SaveToFile();
+                Console.Clear();
+                Console.WriteLine("Student information updated successfully.");
+                AdminEditStudent(student);
+                break;
+            case "3":
+                 student.UpdateGrades();
+                 student.SaveToFile();
+                 Console.Clear();
+                 Console.WriteLine("Student information updated successfully."); 
+                 AdminEditStudent(student);
+                break;
+            default:
+                Console.WriteLine("Invalid option selected.");
+                break;
+        }
+
+       
+    }
+}
+
+        static void UserLogin()
+{
+    Console.Write("Enter your student number: ");
+    string studentNumber = ValidationFunction.ValidateStudentNumber();
+    string filePath = Path.Combine(folderPath, $"{studentNumber}.json");
+
+    if (File.Exists(filePath))
+    {
+        string data = File.ReadAllText(filePath);
+        Student student = JsonConvert.DeserializeObject<Student>(data);
+
+        if (student != null)
+        {
+            Console.Write("Enter your password: ");
+            string password = Console.ReadLine() ?? string.Empty;
+
+            if (student.Password == password)
+            {
+                Console.Clear();
+                EditStudentInfo(student);
+            }
+            else
+            {
+                Console.WriteLine("Incorrect password. Please contact an admin.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Failed to load student data.");
+        }
+    }
+   
+   else
+{
+    Console.Clear();
+    Console.WriteLine("No existing record found with the number "+ studentNumber +  " Let's create a new student profile.");
+    string name = ValidationFunction.ValidateStudentName();
+    int age = ValidationFunction.ValidateStudentAge();
+    Console.Write("Enter a password for your account: ");
+    string password = Console.ReadLine() ?? string.Empty;
+
+    // Use CalculationFunction to collect module names and grades
+    (string[] modules, double[] grades) = CalculationFunction.CalculateStudentGrades();
+
+    // Initialize the new student with the collected data
+    Student newStudent = new Student(name, age, studentNumber, password)
+    {
+        StudentModules = modules,
+        StudentGrades = grades
+    };
+
+    newStudent.SaveToFile();
+    Console.Clear();
+    Console.WriteLine("New student profile created successfully.");
+}
+
+
+}
+static void EditStudentInfo(Student student)
+{  
+    student.DisplayInfo(); 
+    Console.WriteLine("What would you like to edit?");
+    Console.WriteLine("1. Personal Information");
+    Console.WriteLine("2. Password");
+    Console.Write("Select an option (1/2) or type 'no' to exit: ");
+    string editChoice = Console.ReadLine()?.ToLower() ?? string.Empty;
+
+    if (editChoice == "1")
+    {
+        student.UpdateInfo();
+        student.SaveToFile();
+        Console.Clear();
+        Console.WriteLine("Personal information updated successfully."); 
+        EditStudentInfo(student);
+    }
+    else if (editChoice == "2")
+    {
+        Console.Write("Enter a new password: ");
+        student.Password = Console.ReadLine() ?? string.Empty;
+        student.SaveToFile();
+        Console.Clear();
+        Console.WriteLine("Student information updated successfully.");
+        EditStudentInfo(student);
+    }
+    else if (editChoice != "no" && editChoice != "n")
+    {
+        Console.WriteLine("Invalid option. Please try again.");
+    }
+}
+
     }
 }

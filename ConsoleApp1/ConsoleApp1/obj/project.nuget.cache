@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "CtYMpABfdvu03Fgk/b8yNj+NqlO4vIDxRg7UfdaDEySmAGkKzoz7TI54diVXjwySCDprMS0LRPA5p4B7qjPlpg==",
+  "dgSpecHash": "avwO8RAwG206HrEP5MUWLQflIQsxA1+CK8B8P525Cqj0rtcvKiUG967LBn1BoYGtPB5RF5aePSZQV0HIDTDPAw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\zouha\\Downloads\\Empty for now\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\zouha\\OneDrive\\Bureau\\Github\\Csharp\\BPandaa-Student_Grades\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\zouha\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
