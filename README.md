@@ -40,4 +40,9 @@ Distributed under the MIT License. See LICENSE for more information.
 
 Contact
 Your Name – zouhairadnani46@gmail.com
+
 Project Link: https://github.com/BPandaa/BPandaa-Student_Grades.git
+
+### This project need some changes
+- Addjust all functions in their classes
+- Make  more loops
