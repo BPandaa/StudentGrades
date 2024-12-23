@@ -1,4 +1,3 @@
-
 # Student Grades Management System
 
 ## Description
@@ -28,20 +27,6 @@ Clone the repository and navigate to the project directory.
 - Data persistence in JSON files.
 - Contributing
 - Contributions to the project are welcome! Please follow these steps to contribute:
-
-### Fork the repository.
-- Create a new branch (git checkout -b feature/AmazingFeature).
-- Commit your changes (git commit -m 'Add some AmazingFeature').
-- Push to the branch (git push origin feature/AmazingFeature).
-- Open a pull request.
-
-### License
-Distributed under the MIT License. See LICENSE for more information.
-
-Contact
-Your Name – zouhairadnani46@gmail.com
-
-Project Link: https://github.com/BPandaa/BPandaa-Student_Grades.git
 
 ### This project need some changes
 - Addjust all functions in their classes
