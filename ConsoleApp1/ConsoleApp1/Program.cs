@@ -1,242 +1,174 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace StudentsGrades
 {
     class Program
     {
-       
-        public static readonly string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Student Numbers");
+        // Adjust folder path to be relative to the project root, not the output directory.
+        public static string FolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Student Numbers");
+
         static void Main(string[] args)
-        { 
+        {
+            // Display the program title
+            DisplayFunctions.DisplayCenteredTitle(DisplayFunctions.title);
+
+            // Resolve the relative path and convert it to an absolute path
+            FolderPath = Path.GetFullPath(FolderPath);
+
+            // Initialize the folder if necessary
+            InitializeFolder();
+
+            // Main loop for the menu system
             while (true)
             {
-                
-                Console.WriteLine("1. Admin");
-                Console.WriteLine("2. User");
-                Console.WriteLine("3. Quit");
-                Console.Write("Select an option: ");
+                DisplayMainMenu();
+                string option = (Console.ReadLine() ?? string.Empty).ToLower();
+                HandleOption(option);
+            }
+        }
 
-                string option = Console.ReadLine() ?? string.Empty;
-
-                switch (option)
+        // Initialize folder (check if it exists, otherwise create it)
+        static void InitializeFolder()
+        {
+            try
+            {
+                if (!Directory.Exists(FolderPath))
                 {
-                    case "1":
-                        AdminLogin();
-                        break;
-                    case "2":
-                        UserLogin();
-                        break;
-                    case "3":
-                        Console.WriteLine("Goodbye");
-                        return;
-                    default:
-                        Console.WriteLine("Invalid option. Please try again.");
-                        break;
+                    Console.WriteLine("Folder not found, creating 'Student Numbers' folder...");
+                    Directory.CreateDirectory(FolderPath);
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing folder: {ex.Message}");
+                Environment.Exit(1); // Exit program if folder cannot be created.
+            }
         }
 
-            static void AdminLogin()
-{
-    Console.Write("Enter admin password: ");
-    string password = Console.ReadLine() ?? string.Empty;
-
-    if (password == "adminpassword")
-    {
-        Console.Clear();
-        string[] files = Directory.GetFiles(folderPath, "*.json");
-        if (files.Length == 0)
+        // Display the main menu for user and admin options
+        static void DisplayMainMenu()
         {
-            Console.WriteLine("No student records found.");
-            return;
+            DisplayFunctions.DisplayCenteredTitle(DisplayFunctions.title1);
+            Console.WriteLine("\n===== Main Menu =====");
+            Console.WriteLine("1. Admin");
+            Console.WriteLine("2. User");
+            Console.WriteLine("3. Register New Student");
+            Console.WriteLine("4. Quit");
+            Console.Write("Select an option: ");
         }
 
-        while (true) // Loop until a valid student number is entered or the admin chooses to exit
+        // Handle the user's menu selection
+        static void HandleOption(string option)
         {
-            Console.WriteLine("Available student records:");
-            foreach (string file in files)
+            switch (option)
             {
-                Console.WriteLine(Path.GetFileNameWithoutExtension(file));
+                case "1":
+                    Admin.Login();  // Admin class handles login and subsequent actions
+                    break;
+                case "2":
+                    UserLogin();  // Handle user login
+                    break;
+                case "3":
+                    RegisterNewStudent();  // Handle student registration
+                    break;
+                case "4":
+                    Console.WriteLine("Exiting the application...");
+                    Environment.Exit(0);  // Exit the application
+                    break;
+                default:
+                    Console.WriteLine("Invalid option. Try again.");
+                    break;
             }
+        }
 
-            Console.WriteLine("\nEnter the student number to view or edit, or type 'exit' to go back:");
-            string studentNumber = Console.ReadLine() ?? string.Empty;
-            Console.Clear();
-            if (studentNumber.ToLower() == "exit")
-            {
-                break; // Exit the loop and go back
-            }
-
-            string filePath = Path.Combine(folderPath, $"{studentNumber}.json");
+        // Handle the user login functionality
+        static void UserLogin()
+        {
+            Console.Write("\nEnter student number: ");
+            string studentNumber = ValidationFunction.ValidateStudentNumber();
+            string filePath = Path.Combine(FolderPath, $"{studentNumber}.json");
 
             if (File.Exists(filePath))
             {
-                string data = File.ReadAllText(filePath);
-                Student student = JsonConvert.DeserializeObject<Student>(data);
-                if (student != null)
+                try
                 {
-                    AdminEditStudent(student);
-                    break; // Exit the loop after editing
+                    string data = File.ReadAllText(filePath);
+                    Student student = JsonConvert.DeserializeObject<Student>(data);
+
+                    if (student != null)
+                    {
+                        Console.Write("Enter password: ");
+                        string inputPassword = Console.ReadLine() ?? string.Empty;
+                        string hashedInput = SecurityHelper.ComputeSha256Hash(inputPassword);
+
+                        if (student.Password == hashedInput)
+                        {
+                            student.DisplayInfo();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Incorrect password.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to load student data.");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to deserialize student data.");
+                    Console.WriteLine($"Error reading student data: {ex.Message}");
                 }
             }
             else
             {
-                Console.WriteLine("Student record not found. Please try again.");
+                Console.WriteLine("Student not found.");
             }
         }
-    }
-    else
-    {
-        Console.Clear();
-        Console.WriteLine("Incorrect password.");
-    }
-}
-static void AdminEditStudent(Student student)
-{
-    // Display complete student information for admin
-    student.DisplayInfoForAdmin();
 
-    Console.WriteLine("Do you want to edit this student's information? (yes/no)");
-    string editChoice = Console.ReadLine()?.ToLower() ?? string.Empty;
-
-    if (editChoice == "yes" || editChoice == "y")
-    {
-        Console.WriteLine("Select what to edit:");
-        Console.WriteLine("1. Personal Information");
-        Console.WriteLine("2. Password");
-        Console.WriteLine("3. Module Grades");
-        Console.Write("Enter your choice: ");
-        string adminEditChoice = Console.ReadLine() ?? string.Empty;
-
-        switch (adminEditChoice)
+        // Handle registering a new student
+        static void RegisterNewStudent()
         {
-            case "1":
-                student.UpdateInfo();
-                student.SaveToFile();
-                Console.Clear();
-                Console.WriteLine("Student information updated successfully.");
-                AdminEditStudent(student);;
-                break;
-            case "2":
-                 Console.Write("Enter a new password: ");
-                 student.Password = Console.ReadLine() ?? string.Empty;
-                 student.SaveToFile();
-                Console.Clear();
-                Console.WriteLine("Student information updated successfully.");
-                AdminEditStudent(student);
-                break;
-            case "3":
-                 student.UpdateGrades();
-                 student.SaveToFile();
-                 Console.Clear();
-                 Console.WriteLine("Student information updated successfully."); 
-                 AdminEditStudent(student);
-                break;
-            default:
-                Console.WriteLine("Invalid option selected.");
-                break;
-        }
+            Console.WriteLine("\n===== Register New Student =====");
+            string name = ValidationFunction.ValidateStudentName();
+            int age = ValidationFunction.ValidateStudentAge();
+            string studentNumber = ValidationFunction.ValidateStudentNumber();
 
-       
-    }
-}
-
-        static void UserLogin()
-{
-    Console.Write("Enter your student number: ");
-    string studentNumber = ValidationFunction.ValidateStudentNumber();
-    string filePath = Path.Combine(folderPath, $"{studentNumber}.json");
-
-    if (File.Exists(filePath))
-    {
-        string data = File.ReadAllText(filePath);
-        Student student = JsonConvert.DeserializeObject<Student>(data);
-
-        if (student != null)
-        {
-            Console.Write("Enter your password: ");
-            string password = Console.ReadLine() ?? string.Empty;
-
-            if (student.Password == password)
+            // Check if student number already exists
+            string filePath = Path.Combine(FolderPath, $"{studentNumber}.json");
+            if (File.Exists(filePath))
             {
-                Console.Clear();
-                EditStudentInfo(student);
+                Console.WriteLine("A student with this number already exists.");
+                return;
             }
-            else
+
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine()?.Trim() ?? string.Empty;
+            while (string.IsNullOrEmpty(password))
             {
-                Console.WriteLine("Incorrect password. Please contact an admin.");
+                Console.WriteLine("Password cannot be empty.");
+                Console.Write("Enter password: ");
+                password = Console.ReadLine()?.Trim() ?? string.Empty;
             }
+            string hashedPassword = SecurityHelper.ComputeSha256Hash(password);
+
+            var (modules, grades) = CalculationFunction.CalculateStudentGrades();
+
+            Student newStudent = new Student
+            {
+                Name = name,
+                Age = age,
+                StudentNumber = studentNumber,
+                Password = hashedPassword,
+                StudentModules = modules,
+                StudentGrades = grades
+            };
+
+            newStudent.SaveToFile();
+
+            Console.WriteLine("Student registered successfully.\n");
         }
-        else
-        {
-            Console.WriteLine("Failed to load student data.");
-        }
-    }
-   
-   else
-{
-    Console.Clear();
-    Console.WriteLine("No existing record found with the number "+ studentNumber +  " Let's create a new student profile.");
-    string name = ValidationFunction.ValidateStudentName();
-    int age = ValidationFunction.ValidateStudentAge();
-    Console.Write("Enter a password for your account: ");
-    string password = Console.ReadLine() ?? string.Empty;
-
-    // Use CalculationFunction to collect module names and grades
-    (string[] modules, double[] grades) = CalculationFunction.CalculateStudentGrades();
-
-    // Initialize the new student with the collected data
-    Student newStudent = new Student(name, age, studentNumber, password)
-    {
-        StudentModules = modules,
-        StudentGrades = grades
-    };
-
-    newStudent.SaveToFile();
-    Console.Clear();
-    Console.WriteLine("New student profile created successfully.");
-}
-
-
-}
-static void EditStudentInfo(Student student)
-{  
-    student.DisplayInfo(); 
-    Console.WriteLine("What would you like to edit?");
-    Console.WriteLine("1. Personal Information");
-    Console.WriteLine("2. Password");
-    Console.Write("Select an option (1/2) or type 'no' to exit: ");
-    string editChoice = Console.ReadLine()?.ToLower() ?? string.Empty;
-
-    if (editChoice == "1")
-    {
-        student.UpdateInfo();
-        student.SaveToFile();
-        Console.Clear();
-        Console.WriteLine("Personal information updated successfully."); 
-        EditStudentInfo(student);
-    }
-    else if (editChoice == "2")
-    {
-        Console.Write("Enter a new password: ");
-        student.Password = Console.ReadLine() ?? string.Empty;
-        student.SaveToFile();
-        Console.Clear();
-        Console.WriteLine("Student information updated successfully.");
-        EditStudentInfo(student);
-    }
-    else if (editChoice != "no" && editChoice != "n")
-    {
-        Console.WriteLine("Invalid option. Please try again.");
-    }
-}
-
     }
 }
